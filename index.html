@@ -115,37 +115,41 @@
       h2.textContent = `📅 ${anio}° Año`;
       divAnio.appendChild(h2);
 
-      materias
-        .filter(m => m.anio === anio)
-        .forEach(materia => {
-          const divMat = document.createElement("div");
-          divMat.className = "materia";
-          divMat.id = materia.id;
+   materias
+  .filter(m => m.anio === anio)
+  .forEach(materia => {
+    const divMat = document.createElement("div");
+    divMat.className = "materia";
+    divMat.id = materia.id;
 
-          if (aprobadas.has(materia.id)) {
-            divMat.classList.add("aprobada");
-          }
+    // Check si la materia puede cursarse (correlativas aprobadas o no tiene)
+    const habilitado = puedeCursar(materia, aprobadas);
 
-          if (!puedeCursar(materia, aprobadas)) {
-            divMat.classList.add("bloqueada");
-          }
+    if (aprobadas.has(materia.id)) {
+      divMat.classList.add("aprobada");
+    }
 
-          const checkbox = document.createElement("input");
-          checkbox.type = "checkbox";
-          checkbox.value = materia.id;
-          checkbox.disabled = !puedeCursar(materia, aprobadas);
-          checkbox.checked = aprobadas.has(materia.id);
+    if (!habilitado) {
+      divMat.classList.add("bloqueada");
+    }
 
-          checkbox.addEventListener("change", () => render());
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.value = materia.id;
+    checkbox.checked = aprobadas.has(materia.id);
+    checkbox.disabled = !habilitado; // sólo deshabilita si no está habilitada
 
-          const label = document.createElement("label");
-          label.textContent = `${materia.nombre} (${materia.id})`;
-          label.style.marginLeft = "8px";
+    checkbox.addEventListener("change", () => render());
 
-          divMat.appendChild(checkbox);
-          divMat.appendChild(label);
-          divAnio.appendChild(divMat);
-        });
+    const label = document.createElement("label");
+    label.textContent = `${materia.nombre} (${materia.id})`;
+    label.style.marginLeft = "8px";
+
+    divMat.appendChild(checkbox);
+    divMat.appendChild(label);
+    divAnio.appendChild(divMat);
+  });
+
 
       container.appendChild(divAnio);
     });
