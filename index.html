@@ -3,36 +3,31 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Malla Curricular Diseño Gráfico</title>
+<title>Malla Curricular Diseño Gráfico Interactiva</title>
 <style>
   body {
     font-family: Arial, sans-serif;
     background: #001f4d; /* Azul oscuro */
-    color: #cce6ff; /* Azul claro para texto */
+    color: #cce6ff; /* Azul claro */
     padding: 20px;
   }
   .materia {
     border: 2px solid #3399ff;
     border-radius: 12px;
-    background: #004080; /* Azul medio */
+    background: #004080;
     padding: 10px 20px;
     margin: 8px 0;
-    cursor: pointer;
-    user-select: none;
     display: flex;
     align-items: center;
-    transition: background-color 0.3s;
+    user-select: none;
   }
   .materia.aprobada {
-    background: #0073e6; /* Azul más claro */
+    background: #0073e6;
     text-decoration: line-through;
   }
   .materia.bloqueada {
     opacity: 0.5;
     cursor: not-allowed;
-  }
-  .anio {
-    margin-top: 40px;
   }
   h1, h2 {
     color: #99ccff;
@@ -47,7 +42,6 @@
     height: 20px;
     cursor: pointer;
   }
-  /* Que el checkbox siempre tenga cursor pointer */
   input[type="checkbox"]:disabled {
     cursor: not-allowed;
   }
@@ -60,6 +54,7 @@
 <div id="malla-container"></div>
 
 <script>
+  // Definición de materias con correlativas
   const materias = [
     { id: "MCSyE", nombre: "Introducción al Conocimiento de la Sociedad y el Estado", anio: 1, correlativas: [] },
     { id: "IPC", nombre: "Introducción al Pensamiento Científico", anio: 1, correlativas: [] },
@@ -100,15 +95,15 @@
   const anios = [1, 2, 3, 4, 5];
 
   function puedeCursar(materia, aprobadas) {
-    // Si no tiene correlativas, siempre habilitada
+    // Si no tiene correlativas, siempre puede cursar
     if (!materia.correlativas || materia.correlativas.length === 0) return true;
-    // Todas las correlativas aprobadas?
+    // Verifica que todas las correlativas estén aprobadas
     return materia.correlativas.every(c => aprobadas.has(c));
   }
 
   function render() {
     container.innerHTML = "";
-    // Materias marcadas como aprobadas (checkbox checked)
+    // Obtenemos todas las materias marcadas como aprobadas (checked)
     const aprobadas = new Set(
       [...document.querySelectorAll("input[type=checkbox]:checked")].map(cb => cb.value)
     );
@@ -142,7 +137,7 @@
           checkbox.value = materia.id;
           checkbox.checked = aprobadas.has(materia.id);
 
-          // Solo deshabilita si no está habilitada y tiene correlativas (no se puede marcar)
+          // Deshabilita solo si tiene correlativas y no están aprobadas
           checkbox.disabled = !habilitado && materia.correlativas.length > 0;
 
           checkbox.addEventListener("change", () => render());
