@@ -7,23 +7,24 @@
 <style>
   body {
     font-family: Arial, sans-serif;
-    background: #e7f0fc;
-    color: #003366;
+    background: #001f4d; /* Azul oscuro */
+    color: #cce6ff; /* Azul claro para texto */
     padding: 20px;
   }
   .materia {
     border: 2px solid #3399ff;
     border-radius: 12px;
-    background: #cce6ff;
+    background: #004080; /* Azul medio */
     padding: 10px 20px;
     margin: 8px 0;
     cursor: pointer;
     user-select: none;
     display: flex;
     align-items: center;
+    transition: background-color 0.3s;
   }
   .materia.aprobada {
-    background: #80b3ff;
+    background: #0073e6; /* Azul más claro */
     text-decoration: line-through;
   }
   .materia.bloqueada {
@@ -32,6 +33,10 @@
   }
   .anio {
     margin-top: 40px;
+  }
+  h1, h2 {
+    color: #99ccff;
+    user-select: none;
   }
   h2 {
     border-bottom: 2px solid #3399ff;
@@ -42,9 +47,9 @@
     height: 20px;
     cursor: pointer;
   }
-  /* Para que cursor no cambie en checkbox aunque bloqueada */
-  .materia.bloqueada input[type="checkbox"] {
-    cursor: pointer !important;
+  /* Que el checkbox siempre tenga cursor pointer */
+  input[type="checkbox"]:disabled {
+    cursor: not-allowed;
   }
 </style>
 </head>
@@ -95,12 +100,15 @@
   const anios = [1, 2, 3, 4, 5];
 
   function puedeCursar(materia, aprobadas) {
+    // Si no tiene correlativas, siempre habilitada
     if (!materia.correlativas || materia.correlativas.length === 0) return true;
+    // Todas las correlativas aprobadas?
     return materia.correlativas.every(c => aprobadas.has(c));
   }
 
   function render() {
     container.innerHTML = "";
+    // Materias marcadas como aprobadas (checkbox checked)
     const aprobadas = new Set(
       [...document.querySelectorAll("input[type=checkbox]:checked")].map(cb => cb.value)
     );
@@ -133,7 +141,9 @@
           checkbox.type = "checkbox";
           checkbox.value = materia.id;
           checkbox.checked = aprobadas.has(materia.id);
-          checkbox.disabled = !habilitado;
+
+          // Solo deshabilita si no está habilitada y tiene correlativas (no se puede marcar)
+          checkbox.disabled = !habilitado && materia.correlativas.length > 0;
 
           checkbox.addEventListener("change", () => render());
 
