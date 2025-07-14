@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Malla Curricular Diseño Gráfico</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #e7f0fc;
+    color: #003366;
+    padding: 20px;
+  }
+  .materia {
+    border: 2px solid #3399ff;
+    border-radius: 12px;
+    background: #cce6ff;
+    padding: 10px 20px;
+    margin: 8px 0;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+  }
+  .materia.aprobada {
+    background: #80b3ff;
+    text-decoration: line-through;
+  }
+  .materia.bloqueada {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .anio {
+    margin-top: 40px;
+  }
+  h2 {
+    border-bottom: 2px solid #3399ff;
+    padding-bottom: 5px;
+  }
+  input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<h1>Malla Curricular Diseño Gráfico</h1>
+
+<div id="malla-container">
+  <!-- Aquí va la malla con materias -->
+</div>
+
+<script>
+  const materias = [
+    // 1er año - CBC
+    { id: "MCSyE", nombre: "Introducción al Conocimiento de la Sociedad y el Estado", anio: 1, correlativas: [] },
+    { id: "IPC", nombre: "Introducción al Pensamiento Científico", anio: 1, correlativas: [] },
+    { id: "ICP1", nombre: "Introducción al Conocimiento Proyectual I", anio: 1, correlativas: [] },
+    { id: "ICP2", nombre: "Introducción al Conocimiento Proyectual II", anio: 1, correlativas: ["ICP1"] },
+    { id: "MAT", nombre: "Matemática", anio: 1, correlativas: [] },
+    { id: "SEM", nombre: "Semiología", anio: 1, correlativas: [] },
+    { id: "TD", nombre: "Taller de Dibujo", anio: 1, correlativas: [] },
+
+    // 2do año
+    { id: "DG1", nombre: "Diseño Gráfico I", anio: 2, correlativas: ["MCSyE", "IPC", "ICP1", "ICP2", "MAT", "SEM", "TD"] },
+    { id: "M1", nombre: "Morfología I", anio: 2, correlativas: ["MCSyE", "IPC", "ICP1", "ICP2", "MAT", "SEM", "TD"] },
+    { id: "TIP1", nombre: "Tipografía I", anio: 2, correlativas: ["MCSyE", "IPC", "ICP1", "ICP2", "MAT", "SEM", "TD"] },
+    { id: "C1", nombre: "Comunicación I", anio: 2, correlativas: ["MCSyE", "IPC", "ICP1", "ICP2", "MAT", "SEM", "TD"] },
+    { id: "H1", nombre: "Historia I", anio: 2, correlativas: ["MCSyE", "IPC", "ICP1", "ICP2", "MAT", "SEM", "TD"] },
+    { id: "TEC1", nombre: "Tecnología I", anio: 2, correlativas: ["MCSyE", "IPC", "ICP1", "ICP2", "MAT", "SEM", "TD"] },
+    { id: "ELEC1", nombre: "Electiva I (Fotografía o Ilustración)", anio: 2, correlativas: ["MCSyE", "IPC", "ICP1", "ICP2", "MAT", "SEM", "TD"] },
+
+    // 3er año
+    { id: "DG2", nombre: "Diseño Gráfico II", anio: 3, correlativas: ["DG1", "M1", "TIP1", "C1", "H1", "TEC1"] },
+    { id: "M2", nombre: "Morfología II", anio: 3, correlativas: ["M1"] },
+    { id: "TIP2", nombre: "Tipografía II", anio: 3, correlativas: ["TIP1"] },
+    { id: "C2", nombre: "Comunicación II", anio: 3, correlativas: ["C1"] },
+    { id: "H2", nombre: "Historia II", anio: 3, correlativas: ["H1"] },
+    { id: "ME1", nombre: "Medios Expresivos I", anio: 3, correlativas: ["ELEC1"] },
+    { id: "TEC2", nombre: "Tecnología II", anio: 3, correlativas: ["TEC1"] },
+
+    // 4to año
+    { id: "DG3", nombre: "Diseño Gráfico III", anio: 4, correlativas: ["DG2", "M2", "TIP2", "C1", "H1", "TEC1"] },
+    { id: "ME2", nombre: "Medios Expresivos II", anio: 4, correlativas: ["ME1"] },
+    { id: "LPP", nombre: "Legislación y Práctica Profesional", anio: 4, correlativas: ["DG1", "M1", "TIP1", "C1", "H1", "TEC1", "ELEC1"] }, // Simplificado
+    { id: "ELEC_SH", nombre: "Electiva Socio-Humanística", anio: 4, correlativas: ["H2", "C2"] },
+
+    // 5to año
+    { id: "DG4", nombre: "Diseño Gráfico IV", anio: 5, correlativas: ["DG3", "M2", "TIP2"] },
+    { id: "ELEC_OR", nombre: "Electiva Orientada I y II", anio: 5, correlativas: ["DG3", "M2", "TIP2"] },
+    { id: "OPT", nombre: "Optativas I y II", anio: 5, correlativas: ["DG2", "M1", "TIP1", "C1", "H1", "TEC1"] },
+    { id: "SEM_OPT", nombre: "Seminarios Optativos I, II y III", anio: 5, correlativas: ["DG2", "M1", "TIP1", "C1", "H1", "TEC1"] }
+  ];
+
+  const container = document.getElementById("malla-container");
+  const anios = [1, 2, 3, 4, 5];
+
+  function puedeCursar(materia, aprobadas) {
+    // Devuelve true si todas las correlativas están aprobadas
+    return materia.correlativas.every(c => aprobadas.has(c));
+  }
+
+  function render() {
+    container.innerHTML = "";
+    const aprobadas = new Set(
+      [...document.querySelectorAll("input[type=checkbox]:checked")].map(cb => cb.value)
+    );
+
+    anios.forEach(anio => {
+      const divAnio = document.createElement("div");
+      divAnio.className = "anio";
+      const h2 = document.createElement("h2");
+      h2.textContent = `📅 ${anio}° Año`;
+      divAnio.appendChild(h2);
+
+      materias
+        .filter(m => m.anio === anio)
+        .forEach(materia => {
+          const divMat = document.createElement("div");
+          divMat.className = "materia";
+          divMat.id = materia.id;
+
+          if (aprobadas.has(materia.id)) {
+            divMat.classList.add("aprobada");
+          }
+
+          if (!puedeCursar(materia, aprobadas)) {
+            divMat.classList.add("bloqueada");
+          }
+
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.value = materia.id;
+          checkbox.disabled = !puedeCursar(materia, aprobadas);
+          checkbox.checked = aprobadas.has(materia.id);
+
+          checkbox.addEventListener("change", () => render());
+
+          const label = document.createElement("label");
+          label.textContent = `${materia.nombre} (${materia.id})`;
+          label.style.marginLeft = "8px";
+
+          divMat.appendChild(checkbox);
+          divMat.appendChild(label);
+          divAnio.appendChild(divMat);
+        });
+
+      container.appendChild(divAnio);
+    });
+  }
+
+  render();
+</script>
+
+</body>
+</html>
